@@ -66,6 +66,12 @@ module Mongoid # :nodoc:
         associate(Associations::BelongsToRelated, opts)
         field(opts.foreign_key, :type => Mongoid.use_object_ids ? BSON::ObjectID : String)
         index(opts.foreign_key) unless embedded?
+        
+        if options[:polymorphic]
+          field(opts.foreign_type)
+          index(opts.foreign_type)
+        end
+        
       end
 
       # Gets whether or not the document is embedded.
