@@ -21,25 +21,34 @@ module Mongoid #:nodoc:
 
       # Return the foreign key based off the association name.
       def foreign_key
-        key = @attributes[:foreign_key] || klass.name.to_s.foreign_key
-        key.to_s
+        if as
+          key = as.to_s.foreign_key
+        else
+          key = @attributes[:foreign_key] || klass.name.to_s.foreign_key
+          key.to_s
+        end
+        
+        key
+      end
+      
+      def foreign_type
+        name+"_type"
       end
 
       # Returns the name of the inverse_of association
       def inverse_of
         @attributes[:inverse_of]
       end
+      
+      def as
+        @attributes[:as]
+      end
 
       # Return a +Class+ for the options. See #class_name
       def klass
-        class_name.constantize
-      end
-
-      # Return a +String+ representing the associated class_name. If a class_name
-      # was provided, then the constantized class_name will be returned. If not,
-      # a constant based on the association name will be returned.
-      def class_name
-        @attributes[:class_name] || name.to_s.classify
+        class_name = @attributes[:class_name]
+        
+        class_name ? class_name.constantize : name.to_s.classify.constantize
       end
 
       # Returns the association name of the options.

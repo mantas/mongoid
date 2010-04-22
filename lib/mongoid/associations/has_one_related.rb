@@ -12,8 +12,15 @@ module Mongoid #:nodoc:
       # Returns the newly created object.
       def build(attributes = {})
         @target = @klass.instantiate(attributes)
-        inverse = @target.associations.values.detect do |metadata|
-          metadata.options.klass == @parent.class
+        
+        if @foreign_type
+          inverse = @target.associations.values.detect do |metadata|
+            metadata.options.name == @options.as.to_s
+          end
+        else
+          inverse = @target.associations.values.detect do |metadata|
+            metadata.options.klass == @parent.class
+          end
         end
         name = inverse.name
         @target.send("#{name}=", @parent)
@@ -36,9 +43,19 @@ module Mongoid #:nodoc:
       # document: The +Document+ that contains the relationship.
       # options: The association +Options+.
       def initialize(document, options, target = nil)
-        @parent, @klass = document, options.klass
+        @parent, @klass, @options = document, options.klass, options
+        
         @foreign_key = options.foreign_key
-        @target = target || @klass.first(:conditions => { @foreign_key => @parent.id })
+        
+        pre_conditions = { @foreign_key => @parent.id }
+        
+        if options.as
+          @foreign_type = options.as.to_s+"_type"
+          
+          pre_conditions[@foreign_type] = document.class.to_s
+        end
+        
+        @target = target || @klass.first(:conditions => pre_conditions)
         extends(options)
       end
 
