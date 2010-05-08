@@ -142,7 +142,20 @@ module Mongoid #:nodoc:
 
       # Return true if dynamic field setting is enabled.
       def set_allowed?(key)
-        Mongoid.allow_dynamic_fields && !respond_to?("#{key}=")
+        Mongoid.allow_dynamic_fields && !respond_to?("#{key}=") && is_accesible?(key)
+      end
+      
+      # Returns true if accessible
+      def is_accesible?(key)
+        return true unless self.class.attr_accessible_list.any? || self.class.attr_protected_list.any?
+        
+        return false if self.class.attr_protected_list.include?(key.to_sym)
+        
+        if self.class.attr_accessible_list.any?
+          return self.class.attr_accessible_list.include?(key.to_sym)
+        else
+          return true
+        end
       end
 
       # Used when supplying a :reject_if block as an option to
@@ -165,8 +178,13 @@ module Mongoid #:nodoc:
       def write_allowed?(key)
         name = key.to_s
         existing = fields[name]
-        return true unless existing
-        existing.accessible?
+        return is_accesible?(key) unless existing
+        
+        if existing.set_accessible?
+          existing.accessible?
+        else
+          is_accesible?(key)
+        end
       end
     end
 

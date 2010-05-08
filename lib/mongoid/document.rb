@@ -5,8 +5,10 @@ module Mongoid #:nodoc:
     included do
       include Mongoid::Components
 
-      cattr_accessor :primary_key, :hereditary
+      cattr_accessor :primary_key, :hereditary, :attr_accessible_list, :attr_protected_list
       self.hereditary = false
+      self.attr_accessible_list = []
+      self.attr_protected_list = []
 
       attr_accessor :association_name, :_parent
       attr_reader :new_record
@@ -76,6 +78,16 @@ module Mongoid #:nodoc:
           end
         end
         subclasses
+      end
+      
+      # sets list of attributes to be accessible
+      def attr_accessible(*args) 
+        self.attr_accessible_list += args.map(&:to_sym) 
+      end
+      
+      # sets list of attributes to be protected
+      def attr_protected(*args) 
+        self.attr_protected_list += args.map(&:to_sym) 
       end
     end
 
