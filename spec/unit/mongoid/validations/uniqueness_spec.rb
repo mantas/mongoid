@@ -119,4 +119,34 @@ describe Mongoid::Validations::UniquenessValidator do
       validator.validate_each(@document, :title, "Sir")
     end
   end
+  
+  describe "validate :in external collection with custom :field" do
+    before do
+      UniqExternal.create :unique => "1"
+    end
+    
+    it "should not be valid if not unique in external" do
+      UniqIn.new(:ext_unique => "1").valid?.should == false
+    end
+    
+    it "should be valid if unique in external" do
+      UniqIn.new(:ext_unique => "2").valid?.should == true
+    end
+    
+    it "should not update if changing to non unique in external" do
+      u = UniqIn.new(:ext_unique => "2")
+      u.save.should == true
+      
+      u.ext_unique = "1"
+      u.save.should == false
+    end
+    
+    it "should update if changing to unique in external" do
+      u = UniqIn.new(:ext_unique => "2")
+      u.save.should == true
+      
+      u.ext_unique = "3"
+      u.valid?.should == true
+    end
+  end
 end
