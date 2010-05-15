@@ -24,7 +24,7 @@ module Mongoid #:nodoc:
           conditions = {attribute => value}
         end
         
-        conditions[options[:scope]] = document.attributes[options[:scope]] if options.has_key? :scope
+        conditions[options[:scope]] = document.attributes[options[:scope]] if options.has_key?(:scope) && !options[:scope].blank?
         
         if options.has_key? :in
           scope = options[:in].classify.constantize

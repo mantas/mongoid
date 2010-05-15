@@ -46,9 +46,12 @@ module Mongoid #:nodoc:
 
       # Return a +Class+ for the options. See #class_name
       def klass
-        class_name = @attributes[:class_name]
-        
-        class_name ? class_name.constantize : name.to_s.classify.constantize
+        class_name.constantize
+      end
+      
+      # Returns the class name from the options
+      def class_name
+        class_name = (@attributes[:class_name] ? @attributes[:class_name].to_s : name.to_s).classify
       end
 
       # Returns the association name of the options.
