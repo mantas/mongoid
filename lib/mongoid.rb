@@ -21,7 +21,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 require "rubygems"
 
-gem "activemodel", "3.0.0.beta3"
+gem "activemodel", "3.0.0.beta4"
 gem "will_paginate", "3.0.pre"
 gem "mongo", "~>1.0"
 gem "bson", "~>1.0"
